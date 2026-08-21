@@ -1,31 +1,29 @@
 <script setup lang="ts">
-// =====================================================================
 // ConfirmationCard.vue — Live-updating summary panel (Part E)
 // Receives all job data as props and renders a formatted confirmation.
 // Rubric: props (Part E-1 reactive updates), v-if/v-else (Part E-2)
-// =====================================================================
 
 export interface IssuedPart {
-  name: string
-  unitPrice: number
-  qty: number
+  name: string;
+  unitPrice: number;
+  qty: number;
 }
 
 // --- PROPS received from parent (JobCardForm) ---
 const props = defineProps<{
-  plate: string
-  owner: string
-  vehicleClass: string
-  selectedServices: string[]
-  issuedParts: IssuedPart[]
-  labourCharge: number
-  servicesTotal: number
-  partsTotal: number
-  grandTotal: number
-}>()
+  plate: string;
+  owner: string;
+  vehicleClass: string;
+  selectedServices: string[];
+  issuedParts: IssuedPart[];
+  labourCharge: number;
+  servicesTotal: number;
+  partsTotal: number;
+  grandTotal: number;
+}>();
 
 function ugx(n: number): string {
-  return n.toLocaleString('en-UG')
+  return n.toLocaleString("en-UG");
 }
 </script>
 
@@ -36,7 +34,9 @@ function ugx(n: number): string {
       <div class="confirm-badge">📋</div>
       <div>
         <h2 class="confirm-title">Job Card Confirmation</h2>
-        <p class="confirm-subtitle">Live summary — updates as you fill the form</p>
+        <p class="confirm-subtitle">
+          Live summary — updates as you fill the form
+        </p>
       </div>
     </div>
 
@@ -45,15 +45,15 @@ function ugx(n: number): string {
       <div class="confirm-field">
         <span class="cf-label">Plate Number</span>
         <!-- Part E-1: v-if/v-else placeholder if empty — Part E-2 -->
-        <span class="cf-value mono">{{ plate || '—' }}</span>
+        <span class="cf-value mono">{{ plate || "—" }}</span>
       </div>
       <div class="confirm-field">
         <span class="cf-label">Owner</span>
-        <span class="cf-value">{{ owner || '—' }}</span>
+        <span class="cf-value">{{ owner || "—" }}</span>
       </div>
       <div class="confirm-field">
         <span class="cf-label">Vehicle Class</span>
-        <span class="cf-value">{{ vehicleClass || '—' }}</span>
+        <span class="cf-value">{{ vehicleClass || "—" }}</span>
       </div>
     </div>
 
@@ -64,11 +64,9 @@ function ugx(n: number): string {
       <span class="cf-label">Services</span>
       <!-- v-if/v-else for "None selected" placeholder — Part E-2 -->
       <span v-if="selectedServices.length > 0" class="cf-tags">
-        <span
-          v-for="svc in selectedServices"
-          :key="svc"
-          class="cf-tag"
-        >{{ svc }}</span>
+        <span v-for="svc in selectedServices" :key="svc" class="cf-tag">{{
+          svc
+        }}</span>
       </span>
       <span v-else class="cf-placeholder">None selected</span>
     </div>
@@ -81,7 +79,8 @@ function ugx(n: number): string {
           v-for="part in issuedParts"
           :key="part.name"
           class="cf-tag parts-tag"
-        >{{ part.name }} (×{{ part.qty }})</span>
+          >{{ part.name }} (×{{ part.qty }})</span
+        >
       </span>
       <span v-else class="cf-placeholder">None selected</span>
     </div>
@@ -117,7 +116,9 @@ function ugx(n: number): string {
   border: 1.5px solid var(--color-accent);
   border-radius: var(--radius);
   padding: 1.8rem;
-  box-shadow: 0 0 0 1px rgba(79, 124, 255, 0.1), var(--shadow-lg);
+  box-shadow:
+    0 0 0 1px rgba(79, 124, 255, 0.1),
+    var(--shadow-lg);
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
@@ -186,7 +187,7 @@ function ugx(n: number): string {
 }
 
 .cf-value.mono {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   letter-spacing: 0.08em;
   color: var(--color-accent);
 }

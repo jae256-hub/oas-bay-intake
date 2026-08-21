@@ -1,12 +1,11 @@
 <script setup lang="ts">
 // App.vue — Root component
 // Imports Google Fonts and renders the page header + JobCardForm
-import JobCardForm from './components/JobCardForm.vue'
+import JobCardForm from "./components/JobCardForm.vue";
 </script>
 
 <template>
   <div class="app-shell">
-
     <!-- Page header / brand bar -->
     <header class="app-header">
       <div class="header-inner">
@@ -24,22 +23,23 @@ import JobCardForm from './components/JobCardForm.vue'
       </div>
     </header>
 
-    <!-- Main content -->
     <main class="app-main">
       <!-- JobCardForm is the single-page SFC for all intake logic -->
       <JobCardForm />
     </main>
 
     <footer class="app-footer">
-      <p>© 2024 Oyera Auto Service Bay Ltd &mdash; Refactory Vue.js Course | Week 1 Assignment</p>
+      <p>
+        © 2024 Oyera Auto Service Bay Ltd &mdash; Refactory Vue.js Course | Week
+        1 Assignment
+      </p>
     </footer>
-
   </div>
 </template>
 
 <style scoped>
 /* Google Fonts import — Inter typeface */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 .app-shell {
   min-height: 100vh;
@@ -128,8 +128,13 @@ import JobCardForm from './components/JobCardForm.vue'
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 /* ── Main ── */

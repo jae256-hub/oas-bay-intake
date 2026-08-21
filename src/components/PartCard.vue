@@ -1,35 +1,25 @@
 <script setup lang="ts">
-// =====================================================================
-// PartCard.vue — Child component for a single part in the catalogue
-// Rubric: props (Part C-2), emits (Part C-4), v-if/v-else (Part C-3),
-//         scoped CSS (Part D-2)
-// =====================================================================
-
-// --- PROPS (parent → child) ---
 const props = defineProps<{
-  name: string
-  unitPrice: number
-  qtyInStock: number
-}>()
+  name: string;
+  unitPrice: number;
+  qtyInStock: number;
+}>();
 
-// --- EMITS (child → parent) ---
 // Emits 'issue-part' with { name, unitPrice } when button is clicked
 const emit = defineEmits<{
-  (e: 'issue-part', payload: { name: string; unitPrice: number }): void
-}>()
+  (e: "issue-part", payload: { name: string; unitPrice: number }): void;
+}>();
 
 function handleIssue() {
-  emit('issue-part', { name: props.name, unitPrice: props.unitPrice })
+  emit("issue-part", { name: props.name, unitPrice: props.unitPrice });
 }
 
-/** Format a number as UGX currency string */
 function ugx(amount: number): string {
-  return amount.toLocaleString('en-UG')
+  return amount.toLocaleString("en-UG");
 }
 </script>
 
 <template>
-  <!-- Each PartCard rendered via v-for in parent (Part C-1) -->
   <div class="part-card" :class="{ 'out-of-stock': qtyInStock === 0 }">
     <div class="part-header">
       <span class="part-icon">🔩</span>
@@ -46,12 +36,11 @@ function ugx(amount: number): string {
         <span class="detail-label">In Stock</span>
         <!-- Stock count updates immediately (reactivity) — Part C-5 -->
         <span class="detail-value stock" :class="{ low: qtyInStock <= 2 }">
-          {{ qtyInStock }} unit{{ qtyInStock !== 1 ? 's' : '' }}
+          {{ qtyInStock }} unit{{ qtyInStock !== 1 ? "s" : "" }}
         </span>
       </div>
     </div>
 
-    <!-- v-if / v-else conditional rendering — Part C-3 -->
     <button v-if="qtyInStock > 0" class="btn-issue" @click="handleIssue">
       ➕ Issue to Job
     </button>
@@ -59,7 +48,6 @@ function ugx(amount: number): string {
   </div>
 </template>
 
-<!-- Scoped CSS — Part D-2: styles are isolated to PartCard only -->
 <style scoped>
 .part-card {
   background: var(--color-surface);
@@ -69,13 +57,16 @@ function ugx(amount: number): string {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    transform 0.15s,
+    box-shadow 0.2s;
   position: relative;
   overflow: hidden;
 }
 
 .part-card::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0 0 auto;
   height: 3px;
@@ -155,7 +146,9 @@ function ugx(amount: number): string {
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s;
+  transition:
+    opacity 0.2s,
+    transform 0.15s;
   width: 100%;
   letter-spacing: 0.02em;
 }

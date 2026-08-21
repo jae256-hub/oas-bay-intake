@@ -1,157 +1,148 @@
 <script setup lang="ts">
-// =====================================================================
-// JobCardForm.vue — Main form component (Part B + C + D)
-// Rubric: reactive() (Part B), ref() (Part B), v-model ×3+ (Part B-1/2/3),
-//         v-for (Part B-4, C-1), computed (Part B-6), onMounted (Part D-1),
-//         props → PartCard (Part C-2), emit handler (Part C-4)
-// =====================================================================
-import { reactive, ref, computed, onMounted } from 'vue'
-import PartCard from './PartCard.vue'
-import ConfirmationCard from './ConfirmationCard.vue'
-import type { IssuedPart } from './ConfirmationCard.vue'
+import PartCard from "./PartCard.vue";
+import ConfirmationCard from "./ConfirmationCard.vue";
+import type { IssuedPart } from "./ConfirmationCard.vue";
 
-// ── Constants ─────────────────────────────────────────────────────────
-const LABOUR_CHARGE = 20000 // Fixed, read-only — Part B-5
+const LABOUR_CHARGE = 20000; // Fixed, read-only — Part B-5
 
-// ── Services list ─────────────────────────────────────────────────────
 interface Service {
-  id: string
-  label: string
-  price: number
+  id: string;
+  label: string;
+  price: number;
 }
 
 const services: Service[] = [
-  { id: 'oil-change',        label: 'Oil Change',       price: 0 },
-  { id: 'wheel-alignment',   label: 'Wheel Alignment',  price: 30000 }, // fixed — Part B rule
-  { id: 'wheel-balancing',   label: 'Wheel Balancing',  price: 20000 }, // fixed — Part B rule
-  { id: 'engine-service',    label: 'Engine Service',   price: 0 },
-  { id: 'brake-service',     label: 'Brake Service',    price: 0 },
-]
+  { id: "oil-change", label: "Oil Change", price: 0 },
+  { id: "wheel-alignment", label: "Wheel Alignment", price: 30000 }, // fixed — Part B rule
+  { id: "wheel-balancing", label: "Wheel Balancing", price: 20000 }, // fixed — Part B rule
+  { id: "engine-service", label: "Engine Service", price: 0 },
+  { id: "brake-service", label: "Brake Service", price: 0 },
+];
 
 // ── Parts catalogue ───────────────────────────────────────────────────
 interface Part {
-  id: string
-  name: string
-  unitPrice: number
-  qtyInStock: number
+  id: string;
+  name: string;
+  unitPrice: number;
+  qtyInStock: number;
 }
 
-// Parts will be pre-populated in onMounted — Part D-1
-const parts = ref<Part[]>([])
+const parts = ref<Part[]>([]);
 
-// ── Job card state — reactive() for the composite object — Part B ─────
 const jobCard = reactive({
-  plate: '',          // v-model #1 — Part B-1
-  owner: '',          // v-model #2 — Part B-2
-  vehicleClass: '',   // v-model #3 (select) — Part B-3
-  services: [] as string[],  // selected service IDs — Part B-4
-})
+  plate: "", // v-model #1 — Part B-1
+  owner: "", // v-model #2 — Part B-2
+  vehicleClass: "", // v-model #3 (select) — Part B-3
+  services: [] as string[], // selected service IDs — Part B-4
+});
 
-// ── Issued parts tracking ─────────────────────────────────────────────
-const issuedParts = ref<IssuedPart[]>([])
+const issuedParts = ref<IssuedPart[]>([]);
 
-// ── Validation messages — ref() for simple values — Part B ───────────
-const plateError   = ref('')
-const ownerError   = ref('')
+const plateError = ref("");
+const ownerError = ref("");
 
-// ── Plate number validation ───────────────────────────────────────────
 // Format: 3 letters, space, 3 digits, 1 letter  e.g. UBK 123A
 function validatePlate(val: string): boolean {
-  return /^[A-Za-z]{3} \d{3}[A-Za-z]$/.test(val)
+  return /^[A-Za-z]{3} \d{3}[A-Za-z]$/.test(val);
 }
 
 function onPlateInput() {
   plateError.value = validatePlate(jobCard.plate)
-    ? ''
-    : 'Format: 3 letters, space, 3 digits, 1 letter (e.g. UBK 123A)'
+    ? ""
+    : "Format: 3 letters, space, 3 digits, 1 letter (e.g. UBK 123A)";
 }
 
-// ── Owner name validation ─────────────────────────────────────────────
 // Alphabets only, at least 2 characters
 function validateOwner(val: string): boolean {
-  return /^[A-Za-z\s]{2,}$/.test(val.trim())
+  return /^[A-Za-z\s]{2,}$/.test(val.trim());
 }
 
 function onOwnerInput() {
   ownerError.value = validateOwner(jobCard.owner)
-    ? ''
-    : 'Owner name: letters only, at least 2 characters'
+    ? ""
+    : "Owner name: letters only, at least 2 characters";
 }
 
-// ── Computed totals — Part B-6 ────────────────────────────────────────
 const servicesTotal = computed(() => {
   return jobCard.services.reduce((sum, id) => {
-    const svc = services.find(s => s.id === id)
-    return sum + (svc?.price ?? 0)
-  }, 0)
-})
+    const svc = services.find((s) => s.id === id);
+    return sum + (svc?.price ?? 0);
+  }, 0);
+});
 
 const partsTotal = computed(() =>
-  issuedParts.value.reduce((sum, p) => sum + p.unitPrice * p.qty, 0)
-)
+  issuedParts.value.reduce((sum, p) => sum + p.unitPrice * p.qty, 0),
+);
 
-// Grand total: labour + services + parts — live via computed
-const grandTotal = computed(() =>
-  LABOUR_CHARGE + servicesTotal.value + partsTotal.value
-)
+const grandTotal = computed(
+  () => LABOUR_CHARGE + servicesTotal.value + partsTotal.value,
+);
 
-// Issued parts formatted for the confirmation card
-const issuedPartsList = computed<IssuedPart[]>(() => issuedParts.value)
+// Issued parts
+const issuedPartsList = computed<IssuedPart[]>(() => issuedParts.value);
 
 // Selected service labels for confirmation card
 const selectedServiceLabels = computed(() =>
-  jobCard.services.map(id => services.find(s => s.id === id)?.label ?? id)
-)
+  jobCard.services.map((id) => services.find((s) => s.id === id)?.label ?? id),
+);
 
-// ── onMounted lifecycle — Part D-1 ───────────────────────────────────
 onMounted(() => {
   // Log to console as required
-  console.log('OAS Bay Intake loaded')
+  console.log("OAS Bay Intake loaded");
 
-  // Simulate fetching parts from stock (pre-populate the parts array)
   parts.value = [
-    { id: 'engine-oil',   name: 'Engine Oil (20W-50)', unitPrice: 120000, qtyInStock: 10 },
-    { id: 'oil-filter',   name: 'Oil Filter',           unitPrice: 18000,  qtyInStock: 8  },
-    { id: 'brake-fluid',  name: 'Brake Fluid',          unitPrice: 15000,  qtyInStock: 5  },
-    { id: 'brake-pads',   name: 'Brake Pads (Front)',   unitPrice: 45000,  qtyInStock: 4  },
-  ]
-})
+    {
+      id: "engine-oil",
+      name: "Engine Oil (20W-50)",
+      unitPrice: 120000,
+      qtyInStock: 10,
+    },
+    { id: "oil-filter", name: "Oil Filter", unitPrice: 18000, qtyInStock: 8 },
+    { id: "brake-fluid", name: "Brake Fluid", unitPrice: 15000, qtyInStock: 5 },
+    {
+      id: "brake-pads",
+      name: "Brake Pads (Front)",
+      unitPrice: 45000,
+      qtyInStock: 4,
+    },
+  ];
+});
 
-// ── Issue part handler — Part C-4 ────────────────────────────────────
 // Called when PartCard emits 'issue-part'
 function onIssuePart(payload: { name: string; unitPrice: number }) {
   // Reduce stock by 1 — Part C-4
-  const part = parts.value.find(p => p.name === payload.name)
-  if (!part || part.qtyInStock <= 0) return
-  part.qtyInStock--
+  const part = parts.value.find((p) => p.name === payload.name);
+  if (!part || part.qtyInStock <= 0) return;
+  part.qtyInStock--;
 
   // Add to issued parts list or increment qty
-  const existing = issuedParts.value.find(p => p.name === payload.name)
+  const existing = issuedParts.value.find((p) => p.name === payload.name);
   if (existing) {
-    existing.qty++
+    existing.qty++;
   } else {
-    issuedParts.value.push({ name: payload.name, unitPrice: payload.unitPrice, qty: 1 })
+    issuedParts.value.push({
+      name: payload.name,
+      unitPrice: payload.unitPrice,
+      qty: 1,
+    });
   }
 }
 
-/** Helper: is a service's price fixed/read-only? */
 function isFixedService(id: string): boolean {
-  return id === 'wheel-alignment' || id === 'wheel-balancing'
+  return id === "wheel-alignment" || id === "wheel-balancing";
 }
 
 function servicePrice(id: string): number {
-  return services.find(s => s.id === id)?.price ?? 0
+  return services.find((s) => s.id === id)?.price ?? 0;
 }
 
 function ugx(n: number): string {
-  return n.toLocaleString('en-UG')
+  return n.toLocaleString("en-UG");
 }
 </script>
 
 <template>
   <div class="job-form-wrapper">
-
-    <!-- ─── FORM CARD ─────────────────────────────────────────────── -->
     <section class="form-card">
       <div class="form-card-header">
         <span class="header-icon">🚗</span>
@@ -162,13 +153,9 @@ function ugx(n: number): string {
       </div>
 
       <div class="form-body">
-
-        <!-- ── Vehicle Info ──────────────────────────────────────── -->
         <div class="form-section">
           <h3 class="section-title">Vehicle Information</h3>
           <div class="field-grid">
-
-            <!-- Plate Number — v-model #1 — Part B-1 -->
             <div class="field-group">
               <label for="plate">Plate Number</label>
               <input
@@ -179,10 +166,11 @@ function ugx(n: number): string {
                 placeholder="UBK 123A"
                 maxlength="8"
               />
-              <span v-if="plateError" class="field-error">{{ plateError }}</span>
+              <span v-if="plateError" class="field-error">{{
+                plateError
+              }}</span>
             </div>
 
-            <!-- Owner Name — v-model #2 — Part B-2 -->
             <div class="field-group">
               <label for="owner">Owner Name</label>
               <input
@@ -192,10 +180,11 @@ function ugx(n: number): string {
                 @input="onOwnerInput"
                 placeholder="Mukasa James"
               />
-              <span v-if="ownerError" class="field-error">{{ ownerError }}</span>
+              <span v-if="ownerError" class="field-error">{{
+                ownerError
+              }}</span>
             </div>
 
-            <!-- Vehicle Class — v-model #3 (select) — Part B-3 -->
             <div class="field-group">
               <label for="vehicle-class">Vehicle Class</label>
               <select id="vehicle-class" v-model="jobCard.vehicleClass">
@@ -221,7 +210,6 @@ function ugx(n: number): string {
           </div>
         </div>
 
-        <!-- ── Services — v-for + checkboxes — Part B-4 ─────────── -->
         <div class="form-section">
           <h3 class="section-title">Services</h3>
           <div class="services-grid">
@@ -232,7 +220,6 @@ function ugx(n: number): string {
               class="service-item"
               :class="{ checked: jobCard.services.includes(svc.id) }"
             >
-              <!-- v-model on checkbox array — Part B-4 -->
               <input
                 type="checkbox"
                 :value="svc.id"
@@ -254,7 +241,6 @@ function ugx(n: number): string {
           </div>
         </div>
 
-        <!-- ── Running Total — computed via interpolation — Part B-6 -->
         <div class="running-total-bar">
           <div class="total-line">
             <span class="total-label">⚡ Running Total</span>
@@ -262,23 +248,21 @@ function ugx(n: number): string {
             <span class="total-amount">UGX {{ ugx(grandTotal) }}</span>
           </div>
           <div class="total-breakdown">
-            Labour: {{ ugx(LABOUR_CHARGE) }} &nbsp;|&nbsp;
-            Services: {{ ugx(servicesTotal) }} &nbsp;|&nbsp;
-            Parts: {{ ugx(partsTotal) }}
+            Labour: {{ ugx(LABOUR_CHARGE) }} &nbsp;|&nbsp; Services:
+            {{ ugx(servicesTotal) }} &nbsp;|&nbsp; Parts: {{ ugx(partsTotal) }}
           </div>
         </div>
-
       </div>
     </section>
 
-    <!-- ─── PARTS CATALOGUE ─────────────────────────────────────────── -->
     <section class="parts-section">
       <div class="parts-header">
         <h2>Parts Catalogue</h2>
-        <p class="header-sub">Click "Issue to Job" to add a part to the job card</p>
+        <p class="header-sub">
+          Click "Issue to Job" to add a part to the job card
+        </p>
       </div>
 
-      <!-- v-for over parts array — Part C-1 -->
       <div class="parts-grid">
         <PartCard
           v-for="part in parts"
@@ -291,7 +275,6 @@ function ugx(n: number): string {
       </div>
     </section>
 
-    <!-- ─── CONFIRMATION CARD — Part E ─────────────────────────────── -->
     <ConfirmationCard
       :plate="jobCard.plate"
       :owner="jobCard.owner"
@@ -303,7 +286,6 @@ function ugx(n: number): string {
       :partsTotal="partsTotal"
       :grandTotal="grandTotal"
     />
-
   </div>
 </template>
 
@@ -314,7 +296,6 @@ function ugx(n: number): string {
   gap: 2rem;
 }
 
-/* ── Form card ── */
 .form-card {
   background: var(--color-surface);
   border: 1.5px solid var(--color-border);
@@ -353,7 +334,6 @@ function ugx(n: number): string {
   gap: 2rem;
 }
 
-/* ── Sections ── */
 .form-section {
   display: flex;
   flex-direction: column;
@@ -372,13 +352,12 @@ function ugx(n: number): string {
 }
 
 .section-title::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--color-border);
 }
 
-/* ── Field layout ── */
 .field-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -409,7 +388,6 @@ function ugx(n: number): string {
   font-weight: 700;
 }
 
-/* ── Services grid ── */
 .services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -425,7 +403,9 @@ function ugx(n: number): string {
   align-items: flex-start;
   gap: 0.75rem;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
   user-select: none;
 }
 
@@ -475,7 +455,11 @@ function ugx(n: number): string {
 
 /* ── Running total bar ── */
 .running-total-bar {
-  background: linear-gradient(135deg, rgba(79, 124, 255, 0.1), rgba(107, 147, 255, 0.05));
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.1),
+    rgba(107, 147, 255, 0.05)
+  );
   border: 1.5px solid rgba(79, 124, 255, 0.3);
   border-radius: var(--radius-sm);
   padding: 1rem 1.3rem;

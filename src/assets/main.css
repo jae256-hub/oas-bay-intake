@@ -1,4 +1,3 @@
-/* Global reset and base styles */
 *,
 *::before,
 *::after {
@@ -7,30 +6,9 @@
   padding: 0;
 }
 
-:root {
-  --color-bg: #0f1117;
-  --color-surface: #1a1d27;
-  --color-surface-2: #222533;
-  --color-border: #2e3147;
-  --color-accent: #4f7cff;
-  --color-accent-hover: #6b93ff;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-text: #e2e8f0;
-  --color-text-muted: #94a3b8;
-  --color-text-faint: #64748b;
-  --color-gold: #f0a500;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
-  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-}
-
 body {
-  background: var(--color-text);
-  color: var(--color-text);
+  background: #e2e8f0;
+  color: #e2e8f0;
   min-height: 100vh;
   line-height: 1.6;
 }
@@ -41,7 +19,6 @@ body {
   padding: 2rem 1.5rem 4rem;
 }
 
-/* Typography */
 h1,
 h2,
 h3 {
@@ -68,38 +45,40 @@ label {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: #94a3b8;
   margin-bottom: 0.4rem;
 }
 
 input[type="text"],
 select {
   width: 100%;
-  background: var(--color-surface);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  background: #222533;
+  border: 1.5px solid #2e3147;
+  border-radius: var 8px;
   padding: 0.65rem 0.9rem;
-  color: var(--color-text);
+  color: #e2e8f0;
   font-size: 0.95rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   outline: none;
 }
 
 input[type="text"]:focus,
 select:focus {
-  border-color: var(--color-accent);
+  border-color: #4f7cff;
   box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.18);
 }
 
 input[disabled] {
-  background: var(--color-surface-2);
-  color: var(--color-text-muted);
-  border-color: var(--color-border);
+  background: #222533;
+  color: #94a3b8;
+  border-color: #2e3147;
   cursor: not-allowed;
 }
 
 select option {
-  background: var(--color-surface-2);
+  background: #222533;
 }
 
 /* Scrollbar */
@@ -108,10 +87,10 @@ select option {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-bg);
+  background: #0f1117;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: #2e3147;
   border-radius: 4px;
 }
