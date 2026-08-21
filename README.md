@@ -1,3 +1,5 @@
+<img width="1686" height="816" alt="Screenshot 2026-08-17 231635" src="https://github.com/user-attachments/assets/92e49a6c-3904-4867-8296-d172f7f450b0" />
+<img width="1686" height="816" alt="Screenshot 2026-08-17 231635" src="https://github.com/user-attachments/assets/df148c36-b970-440a-a1f8-76336c806a09" />
 # OAS Bay Intake — Oyera Auto Service Bay Ltd
 
 > **Refactory Vue.js Course — Week 1 Assignment**  
