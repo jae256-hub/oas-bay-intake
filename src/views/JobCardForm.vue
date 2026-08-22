@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import PartCard from "./PartCard.vue";
-import ConfirmationCard from "./ConfirmationCard.vue";
-import type { IssuedPart } from "./ConfirmationCard.vue";
+import ConfirmationCard from "../views/ConfirmationCard.vue";
+import type { IssuedPart } from "../views/ConfirmationCard.vue";
+import { ref, computed, onMounted } from "vue";
+import {useRoute} from 'vue-router';
 
-const LABOUR_CHARGE = 20000; // Fixed, read-only — Part B-5
+const route = useRoute()
+const plate = computed(()=>route.params.plate);
+
+const LABOUR_CHARGE = 20000; 
 
 interface Service {
   id: string;
@@ -13,13 +18,12 @@ interface Service {
 
 const services: Service[] = [
   { id: "oil-change", label: "Oil Change", price: 0 },
-  { id: "wheel-alignment", label: "Wheel Alignment", price: 30000 }, // fixed — Part B rule
-  { id: "wheel-balancing", label: "Wheel Balancing", price: 20000 }, // fixed — Part B rule
+  { id: "wheel-alignment", label: "Wheel Alignment", price: 30000 },
+  { id: "wheel-balancing", label: "Wheel Balancing", price: 20000 },
   { id: "engine-service", label: "Engine Service", price: 0 },
   { id: "brake-service", label: "Brake Service", price: 0 },
 ];
 
-// ── Parts catalogue ───────────────────────────────────────────────────
 interface Part {
   id: string;
   name: string;
@@ -29,11 +33,11 @@ interface Part {
 
 const parts = ref<Part[]>([]);
 
-const jobCard = reactive({
-  plate: "", // v-model #1 — Part B-1
-  owner: "", // v-model #2 — Part B-2
-  vehicleClass: "", // v-model #3 (select) — Part B-3
-  services: [] as string[], // selected service IDs — Part B-4
+const jobCard = ref({
+  plate: "", 
+  owner: "",
+  vehicleClass: "", 
+  services: [] as string[],
 });
 
 const issuedParts = ref<IssuedPart[]>([]);
@@ -41,30 +45,30 @@ const issuedParts = ref<IssuedPart[]>([]);
 const plateError = ref("");
 const ownerError = ref("");
 
-// Format: 3 letters, space, 3 digits, 1 letter  e.g. UBK 123A
+
 function validatePlate(val: string): boolean {
   return /^[A-Za-z]{3} \d{3}[A-Za-z]$/.test(val);
 }
 
 function onPlateInput() {
-  plateError.value = validatePlate(jobCard.plate)
+  plateError.value = validatePlate(jobCard.value.plate)
     ? ""
     : "Format: 3 letters, space, 3 digits, 1 letter (e.g. UBK 123A)";
 }
 
-// Alphabets only, at least 2 characters
+
 function validateOwner(val: string): boolean {
   return /^[A-Za-z\s]{2,}$/.test(val.trim());
 }
 
 function onOwnerInput() {
-  ownerError.value = validateOwner(jobCard.owner)
+  ownerError.value = validateOwner(jobCard.value.owner)
     ? ""
     : "Owner name: letters only, at least 2 characters";
 }
 
 const servicesTotal = computed(() => {
-  return jobCard.services.reduce((sum, id) => {
+  return jobCard.value.services.reduce((sum, id) => {
     const svc = services.find((s) => s.id === id);
     return sum + (svc?.price ?? 0);
   }, 0);
@@ -78,17 +82,13 @@ const grandTotal = computed(
   () => LABOUR_CHARGE + servicesTotal.value + partsTotal.value,
 );
 
-// Issued parts
 const issuedPartsList = computed<IssuedPart[]>(() => issuedParts.value);
 
-// Selected service labels for confirmation card
 const selectedServiceLabels = computed(() =>
-  jobCard.services.map((id) => services.find((s) => s.id === id)?.label ?? id),
+  jobCard.value.services.map((id) => services.find((s) => s.id === id)?.label ?? id),
 );
 
 onMounted(() => {
-  // Log to console as required
-  console.log("OAS Bay Intake loaded");
 
   parts.value = [
     {
@@ -108,14 +108,14 @@ onMounted(() => {
   ];
 });
 
-// Called when PartCard emits 'issue-part'
+
 function onIssuePart(payload: { name: string; unitPrice: number }) {
-  // Reduce stock by 1 — Part C-4
+  
   const part = parts.value.find((p) => p.name === payload.name);
   if (!part || part.qtyInStock <= 0) return;
   part.qtyInStock--;
 
-  // Add to issued parts list or increment qty
+  
   const existing = issuedParts.value.find((p) => p.name === payload.name);
   if (existing) {
     existing.qty++;
@@ -141,11 +141,12 @@ function ugx(n: number): string {
 }
 </script>
 
-<template>
+<template >
+  <h1>Job card - {{ plate }}</h1>
   <div class="job-form-wrapper">
     <section class="form-card">
       <div class="form-card-header">
-        <span class="header-icon">🚗</span>
+        <span class="header-icon"></span>
         <div>
           <h2>Job Card Intake</h2>
           <p class="header-sub">Oyera Auto Service Bay Ltd</p>
@@ -195,7 +196,7 @@ function ugx(n: number): string {
               </select>
             </div>
 
-            <!-- Labour Charge — read-only, pre-filled — Part B-5 -->
+        
             <div class="field-group">
               <label for="labour">Labour Charge (UGX)</label>
               <input
@@ -213,7 +214,6 @@ function ugx(n: number): string {
         <div class="form-section">
           <h3 class="section-title">Services</h3>
           <div class="services-grid">
-            <!-- v-for over services array with :key — Part B-4 -->
             <label
               v-for="svc in services"
               :key="svc.id"
@@ -228,9 +228,8 @@ function ugx(n: number): string {
               />
               <div class="service-info">
                 <span class="service-label">{{ svc.label }}</span>
-                <!-- Fixed/read-only badge for wheel services — business rule -->
                 <span v-if="isFixedService(svc.id)" class="service-price fixed">
-                  UGX {{ ugx(servicePrice(svc.id)) }} <em>(fixed)</em>
+                  UGX {{ugx(servicePrice(svc.id)) }} <em>(fixed)</em>
                 </span>
                 <span v-else-if="svc.price > 0" class="service-price">
                   UGX {{ ugx(svc.price) }}
@@ -244,7 +243,6 @@ function ugx(n: number): string {
         <div class="running-total-bar">
           <div class="total-line">
             <span class="total-label">⚡ Running Total</span>
-            <!-- Live computed total shown via {{ }} interpolation -->
             <span class="total-amount">UGX {{ ugx(grandTotal) }}</span>
           </div>
           <div class="total-breakdown">
@@ -259,7 +257,7 @@ function ugx(n: number): string {
       <div class="parts-header">
         <h2>Parts Catalogue</h2>
         <p class="header-sub">
-          Click "Issue to Job" to add a part to the job card
+          Click Issue Job
         </p>
       </div>
 
@@ -287,6 +285,7 @@ function ugx(n: number): string {
       :grandTotal="grandTotal"
     />
   </div>
+  <RouterLink :to="`/job/${plate}`">Open job card</RouterLink>
 </template>
 
 <style scoped>
@@ -297,8 +296,8 @@ function ugx(n: number): string {
 }
 
 .form-card {
-  background: var(--color-surface);
-  border: 1.5px solid var(--color-border);
+  background: rgb(34, 34, 44);
+  border: 1.5px solid rgb(29, 62, 68);
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow);
@@ -306,7 +305,7 @@ function ugx(n: number): string {
 
 .form-card-header {
   background: linear-gradient(135deg, #1e2235, #252a3e);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid whitesmoke;
   padding: 1.4rem 1.8rem;
   display: flex;
   align-items: center;
@@ -345,7 +344,7 @@ function ugx(n: number): string {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--color-accent);
+  color:white;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -499,6 +498,10 @@ function ugx(n: number): string {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  box-sizing:border-box;
+  background-color: #1e2132;
+  width:1050px;
+  height:300px;
 }
 
 .parts-header h2 {
@@ -509,5 +512,15 @@ function ugx(n: number): string {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 1rem;
+  box-sizing: border-box;
+  width:1100px;
+  height:200px;
+  border:20px;
+  border: white;
+  display:flex;
+  flex-direction:row;
+}
+template{
+  background-color: red;
 }
 </style>

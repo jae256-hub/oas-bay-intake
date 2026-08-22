@@ -1,7 +1,4 @@
 <script setup lang="ts">
-// ConfirmationCard.vue — Live-updating summary panel (Part E)
-// Receives all job data as props and renders a formatted confirmation.
-// Rubric: props (Part E-1 reactive updates), v-if/v-else (Part E-2)
 
 export interface IssuedPart {
   name: string;
@@ -9,7 +6,6 @@ export interface IssuedPart {
   qty: number;
 }
 
-// --- PROPS received from parent (JobCardForm) ---
 const props = defineProps<{
   plate: string;
   owner: string;
@@ -28,7 +24,6 @@ function ugx(n: number): string {
 </script>
 
 <template>
-  <!-- Part E — Confirmation card, all fields reactive -->
   <section class="confirm-card">
     <div class="confirm-header">
       <div class="confirm-badge">📋</div>
@@ -40,11 +35,9 @@ function ugx(n: number): string {
       </div>
     </div>
 
-    <!-- Vehicle details row -->
     <div class="confirm-grid">
       <div class="confirm-field">
         <span class="cf-label">Plate Number</span>
-        <!-- Part E-1: v-if/v-else placeholder if empty — Part E-2 -->
         <span class="cf-value mono">{{ plate || "—" }}</span>
       </div>
       <div class="confirm-field">
@@ -59,10 +52,8 @@ function ugx(n: number): string {
 
     <div class="confirm-divider"></div>
 
-    <!-- Services selected -->
     <div class="confirm-row">
       <span class="cf-label">Services</span>
-      <!-- v-if/v-else for "None selected" placeholder — Part E-2 -->
       <span v-if="selectedServices.length > 0" class="cf-tags">
         <span v-for="svc in selectedServices" :key="svc" class="cf-tag">{{
           svc
@@ -71,7 +62,6 @@ function ugx(n: number): string {
       <span v-else class="cf-placeholder">None selected</span>
     </div>
 
-    <!-- Parts issued -->
     <div class="confirm-row">
       <span class="cf-label">Parts Issued</span>
       <span v-if="issuedParts.length > 0" class="cf-tags">
@@ -87,11 +77,10 @@ function ugx(n: number): string {
 
     <div class="confirm-divider"></div>
 
-    <!-- Cost breakdown -->
     <div class="cost-breakdown">
       <div class="cost-row">
         <span>Labour Charge</span>
-        <span>UGX {{ ugx(labourCharge) }}</span>
+        <span>UGX {{ugx(labourCharge)}}</span>
       </div>
       <div class="cost-row">
         <span>Services Total</span>
@@ -103,7 +92,6 @@ function ugx(n: number): string {
       </div>
       <div class="cost-row total-row">
         <span>GRAND TOTAL</span>
-        <!-- Grand total via interpolation, updates live — Part B-6 -->
         <span class="grand-total">UGX {{ ugx(grandTotal) }}</span>
       </div>
     </div>

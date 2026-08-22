@@ -5,7 +5,6 @@ const props = defineProps<{
   qtyInStock: number;
 }>();
 
-// Emits 'issue-part' with { name, unitPrice } when button is clicked
 const emit = defineEmits<{
   (e: "issue-part", payload: { name: string; unitPrice: number }): void;
 }>();
@@ -29,12 +28,10 @@ function ugx(amount: number): string {
     <div class="part-details">
       <div class="detail-row">
         <span class="detail-label">Unit Price</span>
-        <!-- Props displayed — Part C-2 -->
         <span class="detail-value price">UGX {{ ugx(unitPrice) }}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">In Stock</span>
-        <!-- Stock count updates immediately (reactivity) — Part C-5 -->
         <span class="detail-value stock" :class="{ low: qtyInStock <= 2 }">
           {{ qtyInStock }} unit{{ qtyInStock !== 1 ? "s" : "" }}
         </span>
